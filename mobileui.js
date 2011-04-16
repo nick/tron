@@ -14,6 +14,22 @@ Ext.setup({
     }
 });
 
+
+Ext.regModel('Players', {
+    fields: ['name', 'id']
+});
+
+var store = new Ext.data.JsonStore({
+    model  : 'Players',
+    sorters: 'name',
+
+    data: [
+        {name: 'player1',   id: 1},
+        {name: 'player2',   id: 2},
+        {name: 'player3',   id: 3}
+    ]
+});
+
 Tron.defaultAnim = Ext.is.Android ? false : 'slide';
 Tron.App = Ext.extend(Ext.Panel, {
     cls: 'app',
@@ -26,13 +42,15 @@ Tron.App = Ext.extend(Ext.Panel, {
     	function gameRemoteHandler(evt) {
     		var direction = evt.text;
     		console.log('MOVE ' + direction);
-    	
+		
     	}
     
-		var gameControls = [		
+		var gameControls = [
 			new Ext.Button({
 				ui: 'round',
 				text: 'Up',
+				width: 100,
+				height: 100,
 				handler: gameRemoteHandler
 			}),
 			new Ext.Container({
@@ -41,11 +59,15 @@ Tron.App = Ext.extend(Ext.Panel, {
 					new Ext.Button({
 						ui: 'round',
 						text: 'Left',
+						width: 100,
+						height: 100,
 						handler: gameRemoteHandler
 					}),
 					new Ext.Button({
 						ui: 'round',
 						text: 'Right',
+						width: 100,
+						height: 100,
 						handler: gameRemoteHandler
 					}),
 				]
@@ -53,17 +75,33 @@ Tron.App = Ext.extend(Ext.Panel, {
 			new Ext.Button({
 				ui: 'round',
 				text: 'Down',
+				width: 100,
+				height: 100,
 				handler: gameRemoteHandler
+			}),
+			{html: '', padding: 10}, /* just a little spacer */
+			new Ext.List({
+				itemTpl: '{name}',
+				store: store,
+				disableSelection: true
 			})
 		];
 		
+		var gameScreen = [
+			new Ext.Panel({
+				items: gameControls,
+				layout: 'vbox'
+			})
+		];
+    	
+    	
 		var splash = [
 			new Ext.form.FormPanel({
 				items: [
 					{html: 'Welcome to Tron - Ready to Ride?' },
-					{html: 'Name' },
 					new Ext.form.Text({
-						id: 'gamename'
+						id: 'gamename',
+						label: 'Name'
 					}),
 					new Ext.Button({
 						text: 'Join',
@@ -86,14 +124,10 @@ Tron.App = Ext.extend(Ext.Panel, {
 			})
 		];
 		
-		
-		var gameScreen = [
-			new Ext.Panel({
-				items: gameControls,
-				layout: 'vbox'
-			})
-		];
-    	
+
+    	this.dockedItems = new Ext.Toolbar({
+    		title: 'Tron Controller'
+    	});
     	
         this.items = [splash, gameScreen];
         Tron.App.superclass.initComponent.call(this);
