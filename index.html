@@ -1,0 +1,35 @@
+<html>
+ <head>
+  <script type="application/javascript" src="game.js"></script>
+  <script type="application/javascript" src="player.js"></script>
+  <script type="application/javascript">
+    function initTron() {
+          var game = new Game({multiplier: 1});
+
+          game.addPlayer({
+              name: 'Nick',
+              x: 50,
+              y: 50,
+              deltaX: 1,
+              color: '#f00'
+          });
+
+          game.addPlayer({
+              name: 'James',
+              x: 200,
+              y: 200,
+              deltaX: -1,
+              color: '#090'
+          });
+
+          game.start();
+          
+          document.onkeydown = function(e) {
+              game.key(e.keyCode);
+          }
+     }
+  </script>
+ </head>
+ <body onload="initTron();">
+ </body>
+</html>

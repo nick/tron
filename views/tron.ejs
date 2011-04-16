@@ -1,0 +1,57 @@
+<html>
+ <head>
+ <script src="/Socket.IO/socket.io.js"></script>
+  <script type="application/javascript" src="game.js"></script>
+  <script type="application/javascript" src="player.js"></script>
+  <script type="application/javascript">
+    function initTron() {
+          var game = new Game({multiplier: 1});
+
+          // game.addPlayer({
+          //     name: 'Nick',
+          //     x: 50,
+          //     y: 50,
+          //     color: '#f00'
+          // });
+
+          // game.addPlayer({
+          //     name: 'James',
+          //     x: 100,
+          //     y: 50,
+          //     color: '#090'
+          // });
+          
+          var socket = new io.Socket();
+          socket.connect();
+          socket.on('connect', function(){ 
+              console.log("Connected")
+              socket.send('GAME')
+          })
+          socket.on('message', function(msg){ 
+              var keyMatch = msg.match(/player ([0-9]): ([a-z]+)/i);
+              var playerMatch = msg.match(/new player ([0-9]): ([a-z]+)/i);
+              // console.log(msg, keyMatch)
+              if(msg == 'GAME') {
+                  game.start();
+              } else if (keyMatch) {
+                  game.move(Number(keyMatch[1])-1, keyMatch[2]);
+              } else if (playerMatch) {
+                  game.addPlayer({
+                      name: playerMatch[2],
+                      x: 50,
+                      y: game.players.length * 50,
+                      color: 'rgb(' + Math.ceil(Math.rand(255)) + ', ' + Math.ceil(Math.rand(255)) + ', ' + Math.ceil(Math.rand(255)) + ')'
+                  })
+              }
+          })
+          socket.on('disconnect', function(){ console.log('disconnect') })
+
+          document.onkeydown = function(e) {
+              game.key(e.keyCode);
+          }
+     }
+  </script>
+ </head>
+ <body onload="initTron();">
+ </body>
+</html>
