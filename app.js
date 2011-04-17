@@ -8,7 +8,8 @@ var app = express.createServer(
 );
 
 app.get('/', function(req, res){
-    res.render('start.ejs');
+    // res.render('start.ejs');
+    res.redirect('/mobileui.html')
 });
 
 app.get('/tron', function(req, res){
