@@ -18,7 +18,8 @@ app.get('/tron', function(req, res){
 app.get('/player', function(req, res){
     res.render('controls.ejs', {
         layout: false,
-        player: req.query.player
+        player: req.query.player,
+        playerName: req.query.name
     });
 });
 
@@ -27,23 +28,36 @@ app.listen(3000);
 var socket = io.listen(app);
 
 var tronScreen;
-var players = {
-
+var playerSessions = {
 };
 
 socket.on('connection', function(client){
+    client.on('connect', function() {
+        console.log(client.sessionId + " connected")
+    });
     client.on('message', function(msg){
-
+        console.log(client.sessionId)
         console.log("Msg", msg)
+
+        var newPlayerMatch = msg.match('^new player (p[0-9]+)');
+        if(newPlayerMatch) {
+            playerSessions['s' + client.sessionId] = newPlayerMatch[1];
+            console.log(playerSessions)
+        }
+
         if(msg == 'GAME') {
             tronScreen = client;
-        // } else if(msg == 'NEW PLAYER') {
-        //     tronScreen.send(msg);
         } else if(tronScreen && msg) {
             tronScreen.send(msg);
         }
     });
     client.on('disconnect', function(){
-        console.log("Disconnect")
+        if(tronScreen && playerSessions['s' + client.sessionId]) {
+            var msg = 'disconnect: ' + playerSessions['s' + client.sessionId];
+            console.log("SEND " + msg)
+            tronScreen.send(msg);
+        }
+        delete playerSessions['s' + client.sessionId];
+        console.log(client.sessionId + " disconnected", playerSessions, client.sessionId)
     });
 });

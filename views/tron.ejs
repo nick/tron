@@ -5,7 +5,7 @@
   <script type="application/javascript" src="player.js"></script>
   <script type="application/javascript">
     function initTron() {
-          var game = new Game({multiplier: 1});
+          game = new Game({multiplier: 1});
 
           // game.addPlayer({
           //     name: 'Nick',
@@ -28,27 +28,38 @@
               socket.send('GAME')
           })
           socket.on('message', function(msg){ 
-              var keyMatch = msg.match(/player ([0-9]): ([a-z]+)/i);
-              var playerMatch = msg.match(/new player ([0-9]): ([a-z]+)/i);
-              // console.log(msg, keyMatch)
+              var keyMatch = msg.match(/^player (p[0-9]+): ([a-z]+)/i);
+              var disconnectMatch = msg.match(/^disconnect: (p[0-9]+)/);
+              var playerMatch = msg.match(/^new player (p[0-9]+): ([a-z]+)/i);
+              console.log('MSG', msg)
               if(msg == 'GAME') {
+                  // console.log("Starting game...")
                   game.start();
               } else if (keyMatch) {
-                  game.move(Number(keyMatch[1])-1, keyMatch[2]);
+                  // console.log('Key match: ', msg)
+                  game.move(keyMatch[1], keyMatch[2]);
+              } else if (disconnectMatch) {
+                  // console.log('Disconnect: ', msg)
+                  game.removePlayer(disconnectMatch[1]);
               } else if (playerMatch) {
-                  game.addPlayer({
-                      name: playerMatch[2],
-                      x: 50,
-                      y: game.players.length * 50,
-                      color: 'rgb(' + Math.ceil(Math.rand(255)) + ', ' + Math.ceil(Math.rand(255)) + ', ' + Math.ceil(Math.rand(255)) + ')'
-                  })
+                  // console.log("TRON New player", playerMatch);
+                  
+                  
+                  game.addPlayer(playerMatch[1], {
+                      name: playerMatch[2]
+                  });
+                  
+                  game.reset();
+                  
+              } else {
+                  console.log('dunno')
               }
           })
           socket.on('disconnect', function(){ console.log('disconnect') })
 
-          document.onkeydown = function(e) {
-              game.key(e.keyCode);
-          }
+          // document.onkeydown = function(e) {
+          //     game.key(e.keyCode);
+          // }
      }
   </script>
  </head>

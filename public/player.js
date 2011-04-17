@@ -1,8 +1,8 @@
 Player = function(game, cfg) {
     this.game = game;
-    this.startX = cfg.x;
-    this.startY = cfg.y;
-    this.x = cfg.x;
+    this.startX = cfg.x || 50;
+    this.startY = cfg.y || 50;
+    this.x = cfg.x || 50;
     this.name = cfg.name;
     this.y = cfg.y || 50;
     this.deltaX = 1;

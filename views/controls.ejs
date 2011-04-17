@@ -2,10 +2,12 @@
  <head>
    <script src="/Socket.IO/socket.io.js"></script>
    <script>
+       var randomPlayerID = 'p' + (Math.ceil(Math.random() * 10000000000) + 10000000000);
        var socket = new io.Socket();
        socket.connect();
        socket.on('connect', function(){ 
-           console.log('connected') 
+           console.log('connected')
+           socket.send('new player ' + randomPlayerID + ': <%= playerName || 'Player' %>');
        });
        socket.on('message', function(){ console.log('message') })
        socket.on('disconnect', function(){ console.log('disconnect') })
@@ -21,13 +23,15 @@
            } else if (e.keyCode == 40) { // Down
                direction = 'down';
            }
-           socket.send('player <%= player %>: ' + direction);
+           var str = 'player ' + randomPlayerID + ': ' + direction;
+           // console.log(str);
+           socket.send(str);
        }
-       
    </script> 
+
    <style type="text/css" media="screen">
-   .ctrls { position: relative; width: 300px; height: 200px; border: 1px solid black; }
-   input { position: absolute; display: block; width: 50px; height: 50px; padding: 20px; }
+    .ctrls { position: relative; width: 300px; height: 200px; border: 1px solid black; }
+    input { position: absolute; display: block; width: 50px; height: 50px; padding: 20px; }
     #up { top: 0; left: 50px; padding: 20px; }
     #down { top: 100px; left: 50px; }
     #left { top: 50px; left: 0; }

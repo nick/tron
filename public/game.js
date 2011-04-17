@@ -1,9 +1,20 @@
 Game = function(cfg) {
     this.run = true;
     this.multiplier = cfg.multiplier || 2;
-    this.players = [];
+    this.players = {};
+    this.totalPlayers = 0;
+    
     this.newCanvas();
+    this.colorIdx = 0;
+    
+    this.colors = ['red', 'blue', 'green', 'black', 'orange', 'purple', 'yellow'];
+    
 }
+
+Game.prototype.getColor = function() {
+    this.colorIdx = this.colorIdx + 1;
+    return this.colors[this.colorIdx % this.colors.length];
+};
 
 Game.prototype.newCanvas = function() {
     
@@ -22,10 +33,14 @@ Game.prototype.newCanvas = function() {
 
 Game.prototype.reset = function() {
 
-    for(var p=0; p< this.players.length; p++) {
-        this.players[p].reset();
+    var y = 0;
+    for(var playerID in this.players) {
+        this.players[playerID].reset();        
+        y = y + 50;
+        this.players[playerID].y = y;
     }
     
+    this.resetting = false;
     this.newCanvas();
     this.start();
     
@@ -33,7 +48,9 @@ Game.prototype.reset = function() {
 }
 
 Game.prototype.start = function() {
-    console.log("start game")
+    
+    console.log("Starting game...")
+    
     this.run = true;
     this.nextFrame();
     return true;
@@ -45,37 +62,30 @@ Game.prototype.collision = function(playerName) {
     
     this.run = false;
     var thisGame = this;
+    
+    this.resetting = true;
 
     setTimeout(function() {
-        thisGame.reset();
+        if(thisGame.resetting) {
+            thisGame.reset();            
+        }
     }, 2000);
 }
 
-Game.prototype.addPlayer = function(playerCfg) {
-    this.players.push(new Player(this, playerCfg));
-    return true;
+Game.prototype.addPlayer = function(playerID, playerCfg) {
+    console.log("Adding player " + playerID, playerCfg)
+    this.totalPlayers = this.totalPlayers + 1;
+    
+    var player = new Player(this, playerCfg);
+    player.color = this.getColor();
+    this.players[playerID] = player;
+
 }
 
-Game.prototype.key = function(keyCode) {
-    if (keyCode == 37) { // Left
-        this.players[0].turnLeft();
-    } else if (keyCode == 38) { // Up
-        this.players[0].turnUp();
-    } else if (keyCode == 39) { // Right
-        this.players[0].turnRight();
-    } else if (keyCode == 40) { // Down
-        this.players[0].turnDown();
-    } else if (keyCode == 27) { // Down
-        this.run = false;
-    } else if (keyCode == 65) { // Left
-        this.players[1].turnLeft();
-    } else if (keyCode == 87) { // Up
-        this.players[1].turnUp();
-    } else if (keyCode == 68) { // Right
-        this.players[1].turnRight();
-    } else if (keyCode == 83) { // Down
-        this.players[1].turnDown();
-    }
+Game.prototype.removePlayer = function(playerID) {
+    console.log("Removing player " + playerID)
+    delete this.players[playerID];
+    this.totalPlayers = this.totalPlayers - 1;
 }
 
 Game.prototype.move = function(playerID, direction) {
@@ -86,23 +96,25 @@ Game.prototype.move = function(playerID, direction) {
 }
 
 Game.prototype.nextFrame = function() {
-      for (var p=0; p< this.players.length; p++) {
+    
+    for(var playerID in this.players) {
+        var player = this.players[playerID];
+        
+        // console.log(player);
 
-          var player = this.players[p];
+        player.hasCollided();
 
-          player.hasCollided();
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = player.color;
+        this.ctx.moveTo(player.x, player.y);
+        this.ctx.lineTo(player.nextX(), player.nextY());
+        this.ctx.stroke();
+    }
 
-          this.ctx.beginPath();
-          this.ctx.strokeStyle = player.color;
-          this.ctx.moveTo(player.x, player.y);
-          this.ctx.lineTo(player.nextX(), player.nextY());
-          this.ctx.stroke();
-      }
-
-      if (this.run) {
-          var thisGame = this;
-          setTimeout(function() {
-              thisGame.nextFrame()
-          }, 10);
-      }
+    if (this.run) {
+        var thisGame = this;
+        setTimeout(function() {
+            thisGame.nextFrame()
+        }, 10);
+    }
 }
