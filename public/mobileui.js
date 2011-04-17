@@ -2,27 +2,11 @@ var randomPlayerID = 'p' + (Math.ceil(Math.random() * 10000000000) + 10000000000
 var socket = new io.Socket();
 
 socket.on('connect', function(){ 
-    console.log('connected')
+    // console.log('connected')
     socket.send('new player ' + randomPlayerID + ': ' + gameState.playerName);
 });
 socket.on('message', function(){ console.log('message') })
 socket.on('disconnect', function(){ console.log('disconnect') })
-
-// document.onkeydown = function(e) {
-//     var direction;
-//     if (e.keyCode == 37) { // Left
-//         direction = 'left';
-//     } else if (e.keyCode == 38) { // Up
-//         direction = 'up';
-//     } else if (e.keyCode == 39) { // Right
-//         direction = 'right';
-//     } else if (e.keyCode == 40) { // Down
-//         direction = 'down';
-//     }
-//     var str = 'player ' + randomPlayerID + ': ' + direction;
-//     // console.log(str);
-//     socket.send(str);
-// }
 
 Ext.ns('Tron');
 
@@ -36,7 +20,6 @@ Ext.setup({
     onReady: function() {
         var app = new Tron.App();
         Tron.app = app;
-
     }
 });
 
@@ -56,6 +39,13 @@ var store = new Ext.data.JsonStore({
     ]
 });
 
+function gameRemoteHandler(direction) {
+	console.log('MOVE ' + direction);
+	var str = 'player ' + randomPlayerID + ': ' + direction;
+    // console.log(str);
+    socket.send(str);
+}
+
 Tron.defaultAnim = Ext.is.Android ? false : 'slide';
 Tron.App = Ext.extend(Ext.Panel, {
     cls: 'app',
@@ -64,13 +54,6 @@ Tron.App = Ext.extend(Ext.Panel, {
     activeItem: 0,
     
     initComponent: function() {
-    
-    	function gameRemoteHandler(direction) {
-    		console.log('MOVE ' + direction);
-    		var str = 'player ' + randomPlayerID + ': ' + direction;
-            // console.log(str);
-            socket.send(str);
-    	}
     
 		var gameControls = [
 			new Ext.Button({
@@ -142,16 +125,13 @@ Tron.App = Ext.extend(Ext.Panel, {
 							gameState.playerName = splash[0].getComponent('gamename').getValue();
 							
 							socket.connect();
+                            // gyro.init();
+                            // console.log('JOIN ' + gameState.playerName);
 							
-							
-							console.log('JOIN ' + gameState.playerName);
-							
-							// TODO: Plug in Nick's socket login stuff here:
 							var loading = new Ext.LoadMask(
 								Ext.getBody(),
-								{msg: 'Preparing your lightcycle'}
+								{ msg: 'Preparing your lightcycle' }
 							);
-							//loading.show();
 							Tron.app.setActiveItem(1);
 						}
 					})
@@ -171,3 +151,80 @@ Tron.App = Ext.extend(Ext.Panel, {
 });
 
 
+var gyro = {
+
+  direction: 0,
+  x0: 0,
+  y0: 0,
+
+  init: function () {
+    if (window.DeviceMotionEvent!==undefined) {
+      window.addEventListener('devicemotion', function (e) {
+        var acc = e.accelerationIncludingGravity;
+        gyro.update(acc.x, acc.y);
+      }, false);
+    } else {
+      window.addEventListener('deviceorientation', function (e) {
+        gyro.update(-e.beta/2, -e.gamma/2);
+      }, false);
+    }
+  },
+
+  update: function (x, y) {
+    x = x - gyro.x0;
+    y = y - gyro.y0;
+
+    var direction;
+
+    if (x>2) {
+      direction = 0; //1;
+    } else if (x<-2) {
+      direction = 2; //3;
+    } else if (y>2) {
+      direction = 3; //0;
+    } else if (y<-2) {
+      direction = 1; //2;
+    } else {
+      direction = null;
+    }
+
+    if (window.orientation==-90) {
+      direction = (direction + 1) % 4;
+    } else if (window.orientation==180) {
+      direction = (direction + 2) % 4;
+    } else if (window.orientation==90) {
+      direction = (direction +3) % 4;
+    }
+
+    if (gyro.direction != direction) {
+      gyro.onDirectionChange(direction, gyro.direction);
+    }
+    gyro.direction = direction;
+
+  },
+
+  onDirectionChange: function (new_direction, old_direction) {
+      
+    if (new_direction==0) {
+        gameRemoteHandler('up')
+    } else if (new_direction==1) {
+        gameRemoteHandler('right')
+    } else if (new_direction==2) {
+        gameRemoteHandler('down')
+    } else if (new_direction==3) {
+        gameRemoteHandler('left')
+    } else {
+      return;
+    }
+    
+  console.log(new_direction);
+  
+  //   if (selected) {
+  //     socket.send({move: {id: selected.id, x: selected.x + dx, y: selected.y + dy}});
+  //   }
+  // 
+  }
+  
+
+
+}
