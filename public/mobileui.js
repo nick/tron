@@ -2,7 +2,6 @@ var randomPlayerID = 'p' + (Math.ceil(Math.random() * 10000000000) + 10000000000
 var socket = new io.Socket();
 
 socket.on('connect', function(){ 
-    // console.log('connected')
     socket.send('new player ' + randomPlayerID + ': ' + gameState.playerName);
 });
 socket.on('message', function(){ console.log('message') })
@@ -112,6 +111,7 @@ Tron.App = Ext.extend(Ext.Panel, {
     	
 		var splash = [
 			new Ext.form.FormPanel({
+                layout: 'vbox',
 				items: [
 					{html: 'Welcome to Tron - Ready to Ride?' },
 					new Ext.form.Text({
@@ -120,6 +120,8 @@ Tron.App = Ext.extend(Ext.Panel, {
 					}),
 					new Ext.Button({
 						text: 'Join',
+						margin: '20 0',
+						padding: '0 30',
 						handler: function(evt) {
 							// go to the game screen							
 							gameState.playerName = splash[0].getComponent('gamename').getValue();

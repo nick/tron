@@ -7,13 +7,12 @@ Game = function(cfg) {
     this.newCanvas();
     this.colorIdx = 0;
     
-    this.colors = ['red', 'blue', 'green', 'black', 'orange', 'purple', 'yellow'];
-    
+    this.playerColors = ['red', 'blue', 'green', 'black', 'orange', 'purple', 'yellow'];
 }
 
 Game.prototype.getColor = function() {
     this.colorIdx = this.colorIdx + 1;
-    return this.colors[this.colorIdx % this.colors.length];
+    return this.playerColors[this.colorIdx % this.playerColors.length];
 };
 
 Game.prototype.newCanvas = function() {
@@ -21,8 +20,8 @@ Game.prototype.newCanvas = function() {
     if (this.canvas) document.body.removeChild(this.canvas);
     
     this.canvas = document.createElement('canvas');
-    this.canvas.setAttribute('width',500);
-    this.canvas.setAttribute('height',300);
+    this.canvas.setAttribute('width', 500);
+    this.canvas.setAttribute('height', 300);
     this.canvas.style.border = "1px solid black";
 
     document.body.appendChild(this.canvas);
@@ -73,7 +72,7 @@ Game.prototype.collision = function(playerName) {
 }
 
 Game.prototype.addPlayer = function(playerID, playerCfg) {
-    console.log("Adding player " + playerID, playerCfg)
+    console.log("Adding player " + playerID);
     this.totalPlayers = this.totalPlayers + 1;
     
     var player = new Player(this, playerCfg);
@@ -83,16 +82,16 @@ Game.prototype.addPlayer = function(playerID, playerCfg) {
 }
 
 Game.prototype.removePlayer = function(playerID) {
-    console.log("Removing player " + playerID)
+    console.log("Removing player " + playerID);
     delete this.players[playerID];
     this.totalPlayers = this.totalPlayers - 1;
 }
 
 Game.prototype.move = function(playerID, direction) {
-    if (direction == 'up') this.players[playerID].turnUp()
-    else if (direction == 'down') this.players[playerID].turnDown()
-    else if (direction == 'left') this.players[playerID].turnLeft()
-    else if (direction == 'right') this.players[playerID].turnRight()
+    if (direction == 'up') this.players[playerID].turnUp();
+    else if (direction == 'down') this.players[playerID].turnDown();
+    else if (direction == 'left') this.players[playerID].turnLeft();
+    else if (direction == 'right') this.players[playerID].turnRight();
 }
 
 Game.prototype.nextFrame = function() {
@@ -100,8 +99,6 @@ Game.prototype.nextFrame = function() {
     for(var playerID in this.players) {
         var player = this.players[playerID];
         
-        // console.log(player);
-
         player.hasCollided();
 
         this.ctx.beginPath();

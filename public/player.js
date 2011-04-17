@@ -1,13 +1,13 @@
 Player = function(game, cfg) {
     this.game = game;
+    this.name = cfg.name;
     this.startX = cfg.x || 50;
     this.startY = cfg.y || 50;
     this.x = cfg.x || 50;
-    this.name = cfg.name;
     this.y = cfg.y || 50;
     this.deltaX = 1;
     this.deltaY = 0;
-    this.multiplier = game.multiplier;
+    this.multiplier = game.multiplier || 1;
     this.color = cfg.color;
 };
 
@@ -79,7 +79,7 @@ Player.prototype = {
         }
 
         if (collission) {
-            this.game.collision(this.name)
+            this.game.collision(this.name);
         }
     }
 };
