@@ -48,8 +48,8 @@ Tron.App = Ext.extend(Ext.Panel, {
 		var gameControls = [
 			new Ext.Button({
 				ui: 'round',
-				text: 'Up',
-				padding: 50,
+				html: '<img src="images/up-arrow-icon.png"/>',
+				padding: 35,
 				handler: gameRemoteHandler
 			}),
 			new Ext.Container({
@@ -57,24 +57,23 @@ Tron.App = Ext.extend(Ext.Panel, {
 				items: [
 					new Ext.Button({
 						ui: 'round',
-						text: 'Left',
-						padding: 50,
+						html: '<img src="images/left-arrow-icon.png"/>',
+						padding: 35,
 						handler: gameRemoteHandler
 					}),
-					{padding: 50},
+					{padding: 35},
 					new Ext.Button({
 						ui: 'round',
-						text: 'Riht',
-						//html: '<img src="http://www.psdgraphics.com/file/right-arrow-icon.jpg"/>',
-						padding: 50,
+						html: '<img src="images/right-arrow-icon.png"/>',
+						padding: 35,
 						handler: gameRemoteHandler
 					})
 				]
 			}),
 			new Ext.Button({
 				ui: 'round',
-				text: 'Down',
-				padding: 50,
+				html: '<img src="images/down-arrow-icon.png"/>',
+				padding: 35,
 				handler: gameRemoteHandler
 			}),
 			{html: '', padding: 10}, /* just a little spacer */
